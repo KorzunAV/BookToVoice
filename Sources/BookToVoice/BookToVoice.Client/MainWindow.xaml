@@ -1,0 +1,65 @@
+﻿<Window x:Class="BookToVoice.Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Loaded="MainWindow_OnLoaded" Background="#FF3A3A3A"
+        Closed="MainWindow_OnClosed"
+        Title="MainWindow" Height="350" Width="392">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/Glass.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Menu Name="topMenu" Height="23" Width="120" Background="#FF3A3A3A"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Top">
+            <MenuItem Header="Options" Foreground="Silver" Click="MenuItemOptions_OnClick" />
+            <MenuItem Header="About" Foreground="Silver"/>
+        </Menu>
+        <TabControl Name="tabWizard">
+            <TabItem Header="Load" Name="tabItem1">
+                <Grid>
+                    <Button Content="Open" Height="23" HorizontalAlignment="Right" Margin="0,6,6,0"
+                            Name="btnOpen" VerticalAlignment="Top" Width="75" Click="btnOpen_Click" />
+                    <TextBox Name="tbPath" Height="23" Margin="6,6,87,0"
+                             VerticalAlignment="Top" TextChanged="tbPath_TextChanged" />
+                    <ListBox Name="lbFiles" Margin="6,35" SelectionMode="Multiple"/>
+                    <Button Name="btnConvert" Content="Convert selected" Height="23" HorizontalAlignment="Left"
+                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="btnConvert_Click" />
+                    <Button Content="Clean" Height="23" Margin="127,0,0,6"
+                            Name="btnClean" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="106" Click="btnClean_Click" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Convert to *.mp3" Name="tabItem2">
+                <Grid>
+                    <ListBox Name="lbConvertedFiles" Margin="6,6,6,35">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding StateInfo}" FontSize="10" Margin="10 0 0 0" />
+                                    <Button Name="btnEdite" Content="E" Height="23" Width="23" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Click="BtnEdite_OnClick" Margin="0 0 50 0"/>
+                                    <Button Name="btnStartPause" Content="S/P" Height="23" Width="23" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BtnStartPause_OnClick"  Margin="0 0 25 0"/>
+                                    <Button Name="btnDelete" Content="X" Height="23" Width="23" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BtnDelete_OnClick"  />
+
+                                    <TextBlock Grid.Row="1" Text="{Binding NameWithoutExtension}" FontWeight="Bold" Margin="45 0 0 0" />
+                                    <Separator Grid.Row="2"/>
+                                    <TextBlock Grid.Row="3" Text="{Binding FilePath}" FontStyle="Italic" Margin="8,0" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Name="btnToMp3" Content="Convert all" Height="23" HorizontalAlignment="Left"
+                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="btnToMp3_Click" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

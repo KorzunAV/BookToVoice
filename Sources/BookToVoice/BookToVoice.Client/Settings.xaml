@@ -1,0 +1,57 @@
+﻿<Window x:Class="BookToVoice.Client.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:corprop="clr-namespace:BookToVoice.Core.Properties;assembly=BookToVoice.Core"
+        Title="Settings" Height="300" Width="350" Background="#FF525252" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/Glass.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Label Content="Voice speed rate" HorizontalAlignment="Left"/>
+        <TextBox Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=SpeedRate, Mode=TwoWay}" />
+
+        <Label Grid.Row="1" Content="Channels" HorizontalAlignment="Left"/>
+        <TextBox Grid.Row="1" Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=Channels, Mode=TwoWay}" />
+
+        <Label Grid.Row="2" Content="Bits" HorizontalAlignment="Left"/>
+        <TextBox Grid.Row="2" Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=Bits, Mode=TwoWay}" />
+
+        <Label Grid.Row="3" Content="Sample rate" HorizontalAlignment="Left"/>
+        <TextBox Grid.Row="3" Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=SampleRate, Mode=TwoWay}" />
+
+        <Label Grid.Row="4" Content="Voice name" HorizontalAlignment="Left"/>
+        <TextBox Grid.Row="4" Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=VoiceName, Mode=TwoWay}" />
+
+        <Label Grid.Row="5" Content="Path to voice repozitory" HorizontalAlignment="Left"/>
+        <TextBox Grid.Row="5" Grid.Column="1"
+                 Text="{Binding Source={x:Static corprop:Settings.Default}, Path=PathToVoiceRep, Mode=TwoWay}" />
+
+        <Button Content="Close" Height="23" HorizontalAlignment="Right" Margin="0,0,5,5"
+                VerticalAlignment="Bottom" Width="75" Grid.Row="6" Grid.Column="1" Click="btnClose_Click" />
+        <Button Content="Save" Height="23" HorizontalAlignment="Left" Margin="117,0,0,5"
+                VerticalAlignment="Bottom" Width="75" Grid.Row="6" Grid.ColumnSpan="2" Click="btnSave_Click" />
+    </Grid>
+</Window>
