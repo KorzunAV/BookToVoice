@@ -13,14 +13,14 @@ namespace BookToVoice.Core.TextToVoice
     public class TextToVoiceManager : IDisposable
     {
         private static Thread _thread;
-        public enum SupportedExtension { Mp3 }
+        public enum SupportedExtension { Mp3, Opus }
         private readonly Logger _log;
         private readonly ITextToVoiceStrategy _strategy;
         private readonly TextToVoiceModelConteiner _models;
         private readonly string _voiceName;
         private Timer _timer;
         private static readonly Object Synk = new object();
-        
+
         private bool _disposed;
 
         private TextToVoiceManager()
@@ -30,17 +30,16 @@ namespace BookToVoice.Core.TextToVoice
             _voiceName = GetVoiceName();
             _models = new TextToVoiceModelConteiner();
         }
-        
+
         public static TextToVoiceManager Create()
         {
             return new TextToVoiceManager();
         }
-  
+
         public void Add(string fileFullNames)
         {
             var model = new TextToVoiceModel { FilePath = fileFullNames };
-            model.OutFilePath = Path.Combine(Properties.Settings.Default.PathToVoiceRep,
-                            string.Format("{0}.{1}", model.NameWithoutExtension, SupportedExtension.Mp3));
+            model.OutFilePath = Path.Combine(Properties.Settings.Default.PathToVoiceRep, model.NameWithoutExtension);
             _models.Add(model);
         }
 
@@ -195,7 +194,7 @@ namespace BookToVoice.Core.TextToVoice
         }
 
         #region IDisposable
-       
+
         public void Dispose()
         {
             Dispose(true);

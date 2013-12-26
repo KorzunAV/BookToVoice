@@ -2,16 +2,16 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BookToVoice.Core.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SpeedRate" Type="System.Int32" Scope="User">
+    <Setting Name="SpeedRate" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">4</Value>
     </Setting>
-    <Setting Name="Channels" Type="System.Int32" Scope="User">
+    <Setting Name="Channels" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="Bits" Type="System.Int32" Scope="User">
+    <Setting Name="Bits" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">16</Value>
     </Setting>
-    <Setting Name="SampleRate" Type="System.Int32" Scope="User">
+    <Setting Name="SampleRate" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">44100</Value>
     </Setting>
     <Setting Name="VoiceName" Type="System.String" Scope="User">

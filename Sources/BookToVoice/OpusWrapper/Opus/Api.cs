@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using OpusWrapper.Opus.Enums;
+using OpusWrapper.Opus.Presets;
 
 namespace OpusWrapper.Opus
 {
@@ -17,7 +18,7 @@ namespace OpusWrapper.Opus
         /// <param name="channels"></param>
         /// <returns></returns>
         [DllImport("libopus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        internal static extern int opus_decoder_get_size(Channels channels);
+        internal static extern int opus_decoder_get_size(Channels.Template channels);
 
         /// <summary>
         /// Allocates and initializes a decoder state. 
@@ -37,7 +38,7 @@ namespace OpusWrapper.Opus
         /// <param name="channels"></param>
         /// <returns></returns>
         [DllImport("libopus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        internal static extern ErrorCode opus_decoder_init(IntPtr st, SamplingRate fs, Channels channels);
+        internal static extern ErrorCode opus_decoder_init(IntPtr st, SamplingRate.Template fs, Channels.Template channels);
 
         /// <summary>
         /// Decode an Opus packet. 
@@ -137,7 +138,7 @@ namespace OpusWrapper.Opus
         /// <param name="channels"></param>
         /// <returns></returns>
         [DllImport("libopus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        internal static extern int opus_encoder_get_size(Channels channels);
+        internal static extern int opus_encoder_get_size(Channels.Template channels);
 
         /// <summary>
         /// Allocates and initializes an encoder state.
@@ -159,7 +160,7 @@ namespace OpusWrapper.Opus
         /// <param name="application"></param>
         /// <returns></returns>
         [DllImport("libopus.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        internal static extern ErrorCode opus_encoder_init(IntPtr st, SamplingRate fs, Channels channels, ApplicationType application);
+        internal static extern ErrorCode opus_encoder_init(IntPtr st, SamplingRate.Template fs, Channels.Template channels, ApplicationType application);
 
         /// <summary>
         /// Encodes an Opus frame.

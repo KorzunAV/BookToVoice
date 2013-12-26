@@ -56,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Opus\Enums\Bandwidth.cs" />
-    <Compile Include="Opus\Enums\Channels.cs" />
     <Compile Include="Opus\Enums\Complexity.cs" />
     <Compile Include="Opus\Enums\MappingFamily.cs" />
     <Compile Include="Opus\Enums\Delay.cs" />
@@ -65,7 +64,6 @@
     <Compile Include="Opus\Enums\CtlGetRequest.cs" />
     <Compile Include="Opus\Enums\CtlSetRequest.cs" />
     <Compile Include="Opus\Enums\ErrorCode.cs" />
-    <Compile Include="Opus\Enums\SamplingRate.cs" />
     <Compile Include="Opus\Enums\SignalHint.cs" />
     <Compile Include="Ogg\OggConteiner.cs" />
     <Compile Include="Ogg\Page.cs" />
@@ -79,9 +77,13 @@
     <Compile Include="Ogg\Presets\Presets.cs" />
     <Compile Include="Opus\OpusTags.cs" />
     <Compile Include="Opus\Presets\BaseOption.cs" />
+    <Compile Include="Opus\Presets\BitRate.cs" />
+    <Compile Include="Opus\Presets\BitRateEncoding.cs" />
     <Compile Include="Opus\Presets\ChanelTemplateCollection.cs" />
+    <Compile Include="Opus\Presets\Channels.cs" />
     <Compile Include="Opus\Presets\FrameSize.cs" />
-    <Compile Include="Opus\StreamWriter.cs" />
+    <Compile Include="Opus\Presets\Options.cs" />
+    <Compile Include="Opus\Presets\SamplingRate.cs" />
     <Compile Include="Opus\OpusHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

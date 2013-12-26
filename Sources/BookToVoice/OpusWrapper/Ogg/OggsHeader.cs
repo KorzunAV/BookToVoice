@@ -27,17 +27,38 @@ namespace OpusWrapper.Ogg
             LastPage = 0x04
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="?">decide how many segments to include</param>
-        public OggsHeader(int segmentsCount)
+        public OggsHeader(int segmentTableCount)
         {
-            Data = new byte[27 + segmentsCount];
+            Data = new byte[27 + segmentTableCount];
             Data[0] = 0x4f;
             Data[1] = 0x67;
             Data[2] = 0x67;
             Data[3] = 0x53;
+        }
+
+        public OggsHeader(uint pageNo, uint serialNo, byte[] segmentTable, UInt64 granulePos, bool isFirstPacket, bool isFirstPage, bool isLastPage)
+            : this(segmentTable.Length)
+        {
+            if (isFirstPacket)
+            {
+                HeaderTypeFlag = HeaderType.ContinuedPage;
+            }
+            if (isFirstPage)
+            {
+                HeaderTypeFlag = HeaderType.FirstPage;
+            }
+            if (isLastPage)
+            {
+                HeaderTypeFlag = HeaderType.LastPage;
+            }
+
+            GranulePosition = granulePos;
+            BitstreamSerialNumber = serialNo;
+            PageSequenceNumber = pageNo;
+            NumberPageSegments = (byte)segmentTable.Length;
+
+            // segment table
+            SegmentTable = segmentTable;
         }
 
 

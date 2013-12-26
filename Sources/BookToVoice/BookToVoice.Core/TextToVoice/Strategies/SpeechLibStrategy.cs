@@ -5,6 +5,7 @@ using System.Threading;
 using BookToVoice.Core.TextToVoice.Converters;
 using NAudio.Wave;
 using NLog;
+using OpusWrapper.Opus.Presets;
 using SpeechLib;
 
 namespace BookToVoice.Core.TextToVoice.Strategies
@@ -12,20 +13,23 @@ namespace BookToVoice.Core.TextToVoice.Strategies
     public class SpeechLibStrategy : ITextToVoiceStrategy
     {
         private readonly Logger _log;
-        private bool _disposed;
         private SpVoice Voice { get; set; }
         public WaveFormat WaveFormat { get; set; }
         private double t1 = 0;
         private double t11 = 0;
+        private readonly Options _options = new Options();
 
         private SpeechLibStrategy()
         {
             _log = LogManager.GetCurrentClassLogger();
             Voice = new SpVoice
                 {
-                    Rate = Properties.Settings.Default.SpeedRate,
+                    Rate = 0,
                 };
-            WaveFormat = new WaveFormat(Properties.Settings.Default.SampleRate, Properties.Settings.Default.Bits, Properties.Settings.Default.Channels);
+            _options.OutSamplingRate = SamplingRate.Create(Properties.Settings.Default.SampleRate);
+            _options.OutChannels = Channels.Create(Properties.Settings.Default.Channels);
+
+            WaveFormat = new WaveFormat(22050, Properties.Settings.Default.Bits, Properties.Settings.Default.Channels);
             SetVoice(Properties.Settings.Default.VoiceName);
         }
 
@@ -41,30 +45,26 @@ namespace BookToVoice.Core.TextToVoice.Strategies
             //var spFileStream = new SpMemoryStream();
             //Voice.AudioOutputStream = spFileStream;
 
-            using (var fs = new FileStream(model.OutFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+            //using (var fs = new FileStream(model.OutFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+            //using (var converter = new WaveToMp3Convertor(64, WaveFormat, fs))
+            using (var converter = new OpusStreamConvertor(model.OutFilePath, _options))
             {
-                //converter = new OpusConvertor();
-                //using (var converter = new WaveToMp3Convertor(64, WaveFormat, fs))
-                using (var converter = new OpusConvertor())
+                while (model.CurrentLine < model.TextLines.Length && model.CurrentState == TextToVoiceModel.States.Run)
                 {
-                    converter.SetOutStream(fs);
-                    while (model.CurrentLine < model.TextLines.Length && model.CurrentState == TextToVoiceModel.States.Run)
-                    {
-                        var spFileStream = new SpMemoryStream();
-                        Voice.AudioOutputStream = spFileStream;
-                        //  spFileStream.SetData(null);
-                        var textLine = model.TextLines[model.CurrentLine];
-                        var time11 = DateTime.Now;
-                        var wavData = GetBytes(textLine, spFileStream);
-                        var time21 = DateTime.Now;
-                        t11 += (time21 - time11).TotalMilliseconds;
-                        converter.ConvertAsyn(wavData);
-                        model.CurrentLine++;
-                    }
-                    if (model.CurrentLine == model.TextLines.Length)
-                    {
-                        model.CurrentState = TextToVoiceModel.States.Done;
-                    }
+                    var spFileStream = new SpMemoryStream();
+                    Voice.AudioOutputStream = spFileStream;
+                    //  spFileStream.SetData(null);
+                    var textLine = model.TextLines[model.CurrentLine];
+                    var time11 = DateTime.Now;
+                    var wavData = GetBytes(textLine, spFileStream);
+                    var time21 = DateTime.Now;
+                    t11 += (time21 - time11).TotalMilliseconds;
+                    converter.ConvertAsyn(wavData);
+                    model.CurrentLine++;
+                }
+                if (model.CurrentLine == model.TextLines.Length)
+                {
+                    model.CurrentState = TextToVoiceModel.States.Done;
                 }
             }
 
@@ -112,6 +112,8 @@ namespace BookToVoice.Core.TextToVoice.Strategies
         }
 
         #region IDisposable
+        private bool _disposed;
+
         public void Dispose()
         {
             Dispose(true);
@@ -120,14 +122,12 @@ namespace BookToVoice.Core.TextToVoice.Strategies
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this._disposed)
+            if (!_disposed)
             {
-                if (disposing)
-                {
-                    // Dispose managed resources.
-                    _log.Info(string.Format("t1={0}", t1));
-                    _log.Info(string.Format("t11={0}", t11));
-                }
+                // Dispose managed resources.
+                _log.Info(string.Format("t1={0}", t1));
+                _log.Info(string.Format("t11={0}", t11));
+
                 // Note disposing has been done.
                 _disposed = true;
             }

@@ -1,24 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace OpusWrapper.Opus.Presets
 {
     /// <summary>
     /// Opus supports frame sizes from 2.5 ms to 60 ms
     /// </summary>
-    public class FrameSize : BaseOption<int>
+    public class FrameSize : BaseOption<ushort>
     {
-        private static FrameSize _entity;
-        private readonly string _key;
+        private readonly ushort _value;
 
-        public static Dictionary<string, int> Templates = new Dictionary<string, int>
+        public enum Template : ushort
+        {
+            Ms2P5 = 120,
+            Ms5 = 240,
+            Ms10 = 480,
+            Ms20 = 960,
+            Ms40 = 1920,
+            Ms60 = 2880
+        }
+
+        public static Dictionary<ushort, string> Templates = new Dictionary<ushort, string>
             {
-                {"2.5", 120},
-                {"5", 240},
-                {"10", 480},
-                {"20", 960},
-                {"40", 1920},
-                {"60", 2880}
+                {120, "2.5"},
+                {240, "5"},
+                {480, "10"},
+                {960, "20"},
+                {1920, "40"},
+                {2880, "60"}
             };
 
         public override string OptionName
@@ -26,37 +34,31 @@ namespace OpusWrapper.Opus.Presets
             get { return "framesize"; }
         }
 
-        public override string Key
+        public override string InfoValue
         {
-            get { return _key; }
+            get { return Templates[_value]; }
         }
 
-        public override int Value
+        public override ushort Value
         {
-            get { return Templates[_key]; }
+            get { return _value; }
         }
 
 
-        private FrameSize(string frameSizeInMs)
+        private FrameSize(Template frameSize)
         {
-            _key = frameSizeInMs;
+            _value = (ushort)frameSize;
         }
 
 
         public static FrameSize Default()
         {
-            _entity = new FrameSize("20");
-            return _entity;
+            return Create(Template.Ms20);
         }
 
-        public static FrameSize Create(string frameSizeInMs)
+        public static FrameSize Create(Template frameSize)
         {
-            if (Templates.ContainsKey(frameSizeInMs))
-            {
-                _entity = new FrameSize("20");
-                return _entity;
-            }
-            return Default();
+            return new FrameSize(frameSize);
         }
     }
 }

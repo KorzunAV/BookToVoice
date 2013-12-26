@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpusWrapper.Opus.Presets;
 
 namespace OpusWrapper.Opus
 {
@@ -8,6 +9,7 @@ namespace OpusWrapper.Opus
     {
         private readonly int _userCommentListLengthPosition;
         private readonly List<byte> _data;
+        private bool _firtEncoderOptions = true;
 
         public OpusTags()
         {
@@ -48,6 +50,22 @@ namespace OpusWrapper.Opus
             {
                 _data[_userCommentListLengthPosition + i] = newLenBytes[i];
             }
+        }
+
+        public void AddOption<T>(BaseOption<T> option)
+        {
+            AddOption(option.OptionName, option.InfoValue);
+        }
+
+        public void AddOption(string tag, string val)
+        {
+            var line = string.Format("--{0}{1}{2}", tag, string.IsNullOrEmpty(val) ? string.Empty : " ", val);
+            if (_firtEncoderOptions)
+            {
+                AddString(string.Format("ENCODER_OPTIONS={0}", line));
+                _firtEncoderOptions = false;
+            }
+            AddString(string.Format(" {0}", line));
         }
 
         public void Pad(int amount = 512)

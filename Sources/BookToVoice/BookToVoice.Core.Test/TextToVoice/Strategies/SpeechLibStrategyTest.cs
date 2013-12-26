@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using BookToVoice.Core.TextToVoice;
 using BookToVoice.Core.TextToVoice.Strategies;
@@ -19,14 +20,15 @@ namespace BookToVoice.Core.Test.TextToVoice.Strategies
        
 конец";
 
+    
         [Test]
         public void SpeechTest()
         {
-            string filename = "test.opus";
+            string filename = string.Format("test_{0:d_M_yyy_HH_mm_ss}.opus", DateTime.Now);
             SpeechLibStrategy strategy = SpeechLibStrategy.Create();
             var voices = strategy.GetVoiceNames().ToList();
             Assert.IsTrue(voices.Count() == 2, "voices: " + string.Join(", ", voices));
-            
+
             var model = new TextToVoiceModel
                 {
                     CurrentState = TextToVoiceModel.States.Run,

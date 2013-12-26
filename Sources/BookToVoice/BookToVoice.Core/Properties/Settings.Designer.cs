@@ -26,9 +26,9 @@ namespace BookToVoice.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public int SpeedRate {
+        public byte SpeedRate {
             get {
-                return ((int)(this["SpeedRate"]));
+                return ((byte)(this["SpeedRate"]));
             }
             set {
                 this["SpeedRate"] = value;
@@ -38,9 +38,9 @@ namespace BookToVoice.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int Channels {
+        public byte Channels {
             get {
-                return ((int)(this["Channels"]));
+                return ((byte)(this["Channels"]));
             }
             set {
                 this["Channels"] = value;
@@ -50,9 +50,9 @@ namespace BookToVoice.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("16")]
-        public int Bits {
+        public byte Bits {
             get {
-                return ((int)(this["Bits"]));
+                return ((byte)(this["Bits"]));
             }
             set {
                 this["Bits"] = value;
@@ -62,9 +62,9 @@ namespace BookToVoice.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("44100")]
-        public int SampleRate {
+        public uint SampleRate {
             get {
-                return ((int)(this["SampleRate"]));
+                return ((uint)(this["SampleRate"]));
             }
             set {
                 this["SampleRate"] = value;

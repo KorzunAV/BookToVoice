@@ -4,3 +4,7 @@
 /Sources/BookToVoice/BookToVoice.sln.DotSettings.user
 /Sources/BookToVoice/OpusWrapper.Test/OpusWrapper.Test.csproj.user
 /Sources/BookToVoice/OpusWrapper/OpusWrapper.csproj.user
+/Sources/BookToVoice/OpusWrapper/bin
+/Sources/BookToVoice/OpusWrapper/obj
+bin
+obj

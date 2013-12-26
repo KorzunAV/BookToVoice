@@ -1,5 +1,6 @@
 ﻿using System;
 using OpusWrapper.Opus.Enums;
+using OpusWrapper.Opus.Presets;
 
 namespace OpusWrapper.Opus
 {
@@ -15,12 +16,12 @@ namespace OpusWrapper.Opus
         /// <summary>
         /// Gets the output sampling rate of the decoder.
         /// </summary>
-        public SamplingRate OutputSamplingRate { get; private set; }
+        public SamplingRate.Template OutputSamplingRate { get; private set; }
 
         /// <summary>
         /// Gets the number of channels of the decoder.
         /// </summary>
-        public Channels OutputChannels { get; private set; }
+        public Channels.Template OutputChannels { get; private set; }
 
         /// <summary>
         /// Gets or sets the size of memory allocated for decoding data.
@@ -34,7 +35,7 @@ namespace OpusWrapper.Opus
         #endregion properties
 
 
-        private OpusDecoder(IntPtr decoder, SamplingRate outputSamplingRateHz, Channels outputChannels)
+        private OpusDecoder(IntPtr decoder, SamplingRate.Template outputSamplingRateHz, Channels.Template outputChannels)
         {
             _decoder = decoder;
             OutputSamplingRate = outputSamplingRateHz;
@@ -49,7 +50,7 @@ namespace OpusWrapper.Opus
         /// <param name="outputSamplingRateHz">Sample rate to decode at (Hz). This must be one of 8000, 12000, 16000, 24000, or 48000.</param>
         /// <param name="outputChannels">Number of channels to decode.</param>
         /// <returns>A new <c>OpusDecoder</c>.</returns>
-        public static OpusDecoder Create(SamplingRate outputSamplingRateHz, Channels outputChannels)
+        public static OpusDecoder Create(SamplingRate.Template outputSamplingRateHz, Channels.Template outputChannels)
         {
             IntPtr error;
             IntPtr decoder = Api.opus_decoder_create((int)outputSamplingRateHz, (int)outputChannels, out error);

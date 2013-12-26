@@ -3,6 +3,7 @@ using System.IO;
 using NUnit.Framework;
 using OpusWrapper.Opus;
 using OpusWrapper.Opus.Enums;
+using OpusWrapper.Opus.Presets;
 
 namespace OpusWrapper.Test
 {
@@ -15,7 +16,7 @@ namespace OpusWrapper.Test
         {
             const string filename = "test.stream";
             int segmentFrames = 960;
-            var encoder = OpusEncoder.Create(SamplingRate.Sampling48000, Channels.Mono, ApplicationType.Voip);
+            var encoder = OpusEncoder.Create(SamplingRate.Create(SamplingRate.Template.Sampling48000), (byte)Channels.Template.Mono, ApplicationType.Voip);
             encoder.Bitrate = 8192;
             int bytesPerSegment = encoder.FrameByteCount(segmentFrames);
 
@@ -23,9 +24,9 @@ namespace OpusWrapper.Test
             {
                 var l = fs.Length;
 
-                int max = (int)(l);
+                var max = (int)(l);
                 var buf = new byte[max];
-                int len = -1;
+                int len;
 
                 do
                 {
@@ -68,9 +69,7 @@ namespace OpusWrapper.Test
                 {
                     segment[j] = soundBuffer[(i * byteCap) + j];
                 }
-                int len;
-                byte[] buff = encoder.Encode(segment, segment.Length, out len);
-                //var buff3 = _decoder.Decode(buff2, len, out len);
+                byte[] buff = encoder.Encode(segment, segment.Length);
             }
         }
 

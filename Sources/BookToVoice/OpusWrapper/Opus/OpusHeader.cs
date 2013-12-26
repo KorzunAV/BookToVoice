@@ -132,7 +132,7 @@ namespace OpusWrapper.Opus
             Version = version;
             Channels = channels;
             PreSkip = preskip;
-            InputSampleRate = (UInt32)samplingRate;
+            InputSampleRate = samplingRate.Value;
             Gain = gain;
             ChannelMapping = (byte)mappingFamily;
 
