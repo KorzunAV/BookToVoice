@@ -193,6 +193,12 @@ namespace BookToVoice.Core.TextToVoice
             return voiceName;
         }
 
+        public IEnumerable<string> GetVoices()
+        {
+            return _strategy.GetVoiceNames();
+        }
+
+
         #region IDisposable
 
         public void Dispose()
@@ -229,5 +235,6 @@ namespace BookToVoice.Core.TextToVoice
             }
         }
         #endregion IDisposable
+        
     }
 }

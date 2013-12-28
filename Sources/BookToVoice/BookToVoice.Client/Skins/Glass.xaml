@@ -20,10 +20,10 @@
                         </Storyboard>
                         <!-- Создание Storyboard с именем Timeline2. Будет использоваться для "гашения" кнопки. В настройках анимации происходит переход от 1 до 0, за установленное время -->
                         <Storyboard x:Key = "Timeline2">
-                            <DoubleAnimationUsingKeyFrames BeginTime= "00:00:00 " 
+                            <DoubleAnimationUsingKeyFrames BeginTime= "00:00:00" 
                                                    Storyboard.TargetName = "glow"
                                                    Storyboard.TargetProperty = "(UIElement.Opacity)">
-                                <SplineDoubleKeyFrame KeyTime= "00:00:00.3000000 " Value ="0"/>
+                                <SplineDoubleKeyFrame KeyTime= "00:00:00.3000000" Value ="0"/>
                             </DoubleAnimationUsingKeyFrames>
                         </Storyboard>
                         <!-- Конец хранения ресурсов контрола-->
@@ -42,8 +42,8 @@
                             <!-- Разбиваем пространство на 2-е строки. Это нужно для реализации эффекта стеклянной поверхности -->
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height = "0.507* "/>
-                                    <RowDefinition Height = "0.493* "/>
+                                    <RowDefinition Height = "0.507*"/>
+                                    <RowDefinition Height = "0.493*"/>
                                 </Grid.RowDefinitions>
                                 <!-- Рисуем внутри кнопки "свечение". Тот самый эффект который происходит при наведении на кнопку курсором мыши. Название шейпа будет glow -->
                                 <!-- Задаём непрозрачность шейпа 0 (это начальное значение, тоесть пока кнопка не активна) -->
@@ -257,11 +257,11 @@
     <Style TargetType="ScrollViewer">
         <Setter Property="Background" Value="#FF525252"/>
     </Style>
-    
+
     <Style TargetType="TabControl">
         <Setter Property="Background" Value="#FF525252"/>
     </Style>
-    
+
     <Style TargetType="ListBoxItem">
         <Setter Property="Margin" Value="3"/>
         <Setter Property="Template">
@@ -280,21 +280,25 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-	 <Style TargetType="ComboBox">
+    
+    <Style TargetType="ComboBox">
+        <Setter Property="Background" Value="#FF525252"/>
+        <Setter Property="Foreground" Value="Silver"/>
+    </Style>
+    <Style TargetType="ComboBoxItem">
         <Setter Property="Background" Value="#FF807C7C"/>
         <Setter Property="Foreground" Value="Silver"/>
     </Style>
-	
+
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="#FF807C7C"/>
         <Setter Property="Foreground" Value="Silver"/>
     </Style>
-    
+
     <Style TargetType="Label">
         <Setter Property="Foreground" Value="Silver"/>
     </Style>
-    
+
     <Style TargetType="ListBox">
         <Setter Property="Background" Value="#FF807C7C"/>
     </Style>

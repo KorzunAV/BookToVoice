@@ -187,8 +187,6 @@ namespace BookToVoice.Client
 					lbFiles.Items.Add(fileName);
 				}
 			}
-
-
 		}
 
 		private void LbFilesDragOver(object sender, DragEventArgs e)
