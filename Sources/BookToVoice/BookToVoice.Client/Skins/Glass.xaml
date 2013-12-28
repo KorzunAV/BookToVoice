@@ -281,6 +281,11 @@
         </Setter>
     </Style>
 
+	 <Style TargetType="ComboBox">
+        <Setter Property="Background" Value="#FF807C7C"/>
+        <Setter Property="Foreground" Value="Silver"/>
+    </Style>
+	
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="#FF807C7C"/>
         <Setter Property="Foreground" Value="Silver"/>

@@ -22,14 +22,15 @@
             <TabItem Header="Load" Name="tabItem1">
                 <Grid>
                     <Button Content="Open" Height="23" HorizontalAlignment="Right" Margin="0,6,6,0"
-                            Name="btnOpen" VerticalAlignment="Top" Width="75" Click="btnOpen_Click" />
+                            Name="btnOpen" VerticalAlignment="Top" Width="75" Click="BtnOpenClick" />
                     <TextBox Name="tbPath" Height="23" Margin="6,6,87,0"
-                             VerticalAlignment="Top" TextChanged="tbPath_TextChanged" />
-                    <ListBox Name="lbFiles" Margin="6,35" SelectionMode="Multiple"/>
+                             VerticalAlignment="Top" TextChanged="TbPathTextChanged" />
+                    <ListBox Name="lbFiles" Margin="6,35" AllowDrop="True" Drop="LbFilesDrop"
+							 SelectionMode="Multiple" DragOver="LbFilesDragOver" />
                     <Button Name="btnConvert" Content="Convert selected" Height="23" HorizontalAlignment="Left"
-                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="btnConvert_Click" />
+                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="BtnConvertClick" />
                     <Button Content="Clean" Height="23" Margin="127,0,0,6"
-                            Name="btnClean" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="106" Click="btnClean_Click" />
+                            Name="btnClean" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="106" Click="BtnCleanClick" />
                 </Grid>
             </TabItem>
             <TabItem Header="Convert to *.mp3" Name="tabItem2">
@@ -57,7 +58,7 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                     <Button Name="btnToMp3" Content="Convert all" Height="23" HorizontalAlignment="Left"
-                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="btnToMp3_Click" />
+                            Margin="6,0,0,6" VerticalAlignment="Bottom" Width="106" Click="BtnToMp3Click" />
                 </Grid>
             </TabItem>
         </TabControl>
