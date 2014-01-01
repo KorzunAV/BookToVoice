@@ -107,7 +107,7 @@ namespace OpusWrapper.Opus
         /// <param name="channels"></param>
         /// <param name="samplingRate"></param>
         /// <param name="preskip"></param>
-        public OpusHeader(byte channels, SamplingRate samplingRate, byte preskip)
+        public OpusHeader(byte channels, SamplingRate samplingRate, UInt16 preskip)
             : this(channels, channels > 8 ? MappingFamily.Multy : MappingFamily.Vorbis, samplingRate, preskip, 0, 1) { }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace OpusWrapper.Opus
         /// <param name="preskip"></param>
         /// <param name="gain">0 dB gain is recommended unless you know what you're doing</param>
         /// <param name="version"></param>
-        public OpusHeader(byte channels, MappingFamily mappingFamily, SamplingRate samplingRate, byte preskip, UInt16 gain, byte version)
+        public OpusHeader(byte channels, MappingFamily mappingFamily, SamplingRate samplingRate, UInt16 preskip, UInt16 gain, byte version)
         {
             Packet = new byte[21 + channels];
 

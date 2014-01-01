@@ -24,7 +24,7 @@ namespace BookToVoice.Core.TextToVoice.Strategies
             _log = LogManager.GetCurrentClassLogger();
             Voice = new SpVoice
                 {
-                    Rate = 0,
+                    Rate = Properties.Settings.Default.SpeedRate,
                 };
             _options.OutSamplingRate = SamplingRate.Create(Properties.Settings.Default.SampleRate);
             _options.OutChannels = Channels.Create(Properties.Settings.Default.Channels);

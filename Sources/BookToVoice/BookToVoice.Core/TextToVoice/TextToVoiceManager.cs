@@ -175,9 +175,9 @@ namespace BookToVoice.Core.TextToVoice
                 {
                     var text = sr.ReadToEnd();
                     typedModel.SetText(text);
-                    typedModel.CurrentState = TextToVoiceModel.States.Run;
-                    _strategy.Execute(typedModel, _voiceName);
                 }
+                typedModel.CurrentState = TextToVoiceModel.States.Run;
+                _strategy.Execute(typedModel, _voiceName);
             }
         }
 
@@ -235,6 +235,6 @@ namespace BookToVoice.Core.TextToVoice
             }
         }
         #endregion IDisposable
-        
+
     }
 }

@@ -55,6 +55,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ogg\StreamState.cs" />
     <Compile Include="Opus\Enums\Bandwidth.cs" />
     <Compile Include="Opus\Enums\Complexity.cs" />
     <Compile Include="Opus\Enums\MappingFamily.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="Ogg\OggsHeader.cs" />
     <Compile Include="Ogg\Api.cs" />
     <Compile Include="Ogg\Packet.cs" />
-    <Compile Include="Ogg\StreamState.cs" />
     <Compile Include="Opus\Api.cs" />
     <Compile Include="Opus\OpusDecoder.cs" />
     <Compile Include="Opus\OpusEncoder.cs" />

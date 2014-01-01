@@ -62,27 +62,22 @@ namespace BookToVoice.Core.TextToVoice.Converters
             int segmentsEnd = segmentCount * byteCap;
             int notEncodedCount = soundBuffer.Length - segmentsEnd;
             _notEncodedBuffer = new byte[notEncodedCount];
-            for (int i = 0; i < notEncodedCount; i++)
-            {
-                _notEncodedBuffer[i] = soundBuffer[segmentsEnd + i];
-            }
-
+            Array.Copy(soundBuffer, segmentsEnd, _notEncodedBuffer, 0, notEncodedCount);
+            _granulepos += (UInt64)waveData.Length;
             for (uint i = 0; i < segmentCount; i++)
             {
                 var segment = new byte[byteCap];
-                for (int j = 0; j < segment.Length; j++)
-                {
-                    segment[j] = soundBuffer[(i * byteCap) + j];
-                }
+                Array.Copy(soundBuffer, i * byteCap, segment, 0, segment.Length);
                 byte[] buff = _encoder.Encode(segment, segment.Length);
-
-                SetData(_streamState, buff, i);
+                SetData(_streamState, buff, i, _granulepos);
             }
         }
 
+        private UInt64 _granulepos;
+
         private void SetHeader(StreamState os, Stream stream)
         {
-            byte preskip = 144;// inopt.skip * (48000 / coding_rate);
+            UInt16 preskip = 0;
 
             var header = new OpusHeader(_options.OutChannels.Value, _options.OutSamplingRate, preskip);
             var op = new Packet
@@ -119,7 +114,7 @@ namespace BookToVoice.Core.TextToVoice.Converters
             os.Flush(stream);
         }
 
-        private void SetData(StreamState os, byte[] packet, UInt64 idPacket)
+        private void SetData(StreamState os, byte[] packet, UInt64 idPacket, UInt64 granulepos)
         {
             //UInt64 original_samples = 0;
             //UInt64 rate = 48000;
@@ -134,7 +129,7 @@ namespace BookToVoice.Core.TextToVoice.Converters
             {
                 PacketData = packet,
                 Bos = 0,
-                Granulepos = idPacket * (ushort)_options.OutSamplingRate.Value,
+                Granulepos = granulepos,
                 PacketNo = 2 + idPacket
             };
             os.Packetin(opData);
