@@ -10,56 +10,71 @@ namespace BookToVoice.Core.TextToVoice.Converters
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private static readonly object Synk = new object();
         protected static readonly Queue<byte[]> DataQueue = new Queue<byte[]>();
+        readonly EventWaitHandle _eventWaitHandle = new AutoResetEvent(false);
+        private bool _disposing;
+        private readonly Thread _thread;
+        private double _totalConvertTime;
+        private UInt64 _totalConvertCount;
 
-        private Thread _thread;
 
-        private double t1 = 0;
-        private double t11 = 0;
-        private static double t2 = 0;
+        public int DataQueueCount
+        {
+            get
+            {
+                if (DataQueue == null)
+                {
+                    return 0;
+                }
+                return DataQueue.Count;
+            }
+        }
     
+
+
+        protected BaseStreamConvertor()
+        {
+            _thread = new Thread(Convert);
+            _thread.Start();
+        }
 
         public void ConvertAsyn(byte[] waveData)
         {
-            var time1 = DateTime.Now;
             lock (Synk)
             {
                 DataQueue.Enqueue(waveData);
-
-                if (_thread == null || !_thread.IsAlive)
-                {
-                    _thread = new Thread(Convert);
-                    _thread.Start();
-                }
             }
-            var time2 = DateTime.Now;
-            t1 += (time2 - time1).TotalMilliseconds;
-
-            var time11 = DateTime.Now;
-            //TODO:Find another approach for saving memory
-            if (DataQueue.Count > 10)
+            _eventWaitHandle.Set();
+            if (DataQueueCount > 20)
             {
-                _thread.Join(TimeSpan.FromSeconds(10));
+                _thread.Join((int)(20 * _totalConvertTime / _totalConvertCount));
             }
-            var time21 = DateTime.Now;
-            t11 += (time21 - time11).TotalMilliseconds;
+        }         
+          
+        public void Pause(int millisecondsTimeout)
+        {
+            _thread.Join(millisecondsTimeout);
         }
 
         private void Convert()
         {
-            var time1 = DateTime.Now;
-
+            do
+            {
             while (DataQueue.Count > 0)
             {
-                byte[] waveData;
+                    _totalConvertCount++;
+                    var time1 = DateTime.Now;
+                    byte[] waveData;
                 lock (Synk)
                 {
                     waveData = DataQueue.Dequeue();
                 }
                 ExecuteConvert(waveData);
+                    var time2 = DateTime.Now;
+                    _totalConvertTime += (time2 - time1).TotalMilliseconds;
             }
 
-            var time2 = DateTime.Now;
-            t2 += (time2 - time1).TotalMilliseconds;
+                _eventWaitHandle.WaitOne();
+            } while (!_disposing);
         }
 
         protected abstract void ExecuteConvert(byte[] waveData);
@@ -76,18 +91,18 @@ namespace BookToVoice.Core.TextToVoice.Converters
         {
             if (!_disposed)
             {
+                _disposing = true;
+                _eventWaitHandle.Set();
+
                 if (_thread != null && _thread.IsAlive)
                 {
                     _thread.Join();
                 }
-                Log.Info(string.Format("t1={0}", t1));
-                Log.Info(string.Format("t11={0}", t11));
-                Log.Info(string.Format("t2={0}", t2));
+                Log.Info(string.Format("BaseStreamConvertor total convert time ={0}, total convert count ={1}", _totalConvertTime, _totalConvertCount));
                 // Note disposing has been done.
                 _disposed = true;
             }
         }
         #endregion IDisposable
-
     }
 }

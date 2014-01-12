@@ -67,6 +67,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="TextToVoice\Converters\BaseStreamConvertor.cs" />
+    <Compile Include="TextToVoice\Converters\ConvertorFactory.cs" />
     <Compile Include="TextToVoice\Deserialization.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -94,5 +94,17 @@ namespace BookToVoice.Core.Properties {
                 this["PathToVoiceRep"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("24")]
+        public ushort BitRate {
+            get {
+                return ((ushort)(this["BitRate"]));
+            }
+            set {
+                this["BitRate"] = value;
+            }
+        }
     }
 }

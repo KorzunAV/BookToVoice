@@ -9,21 +9,11 @@ namespace OpusWrapper.Opus
     /// </summary>
     public class OpusEncoder : IDisposable
     {
+        private readonly uint _maxDataBytes;
+        private readonly byte _inputChannels;
         private IntPtr _encoder;
 
         #region properties
-        
-        /// <summary>
-        /// Gets the number of channels of the encoder.
-        /// </summary>
-        public byte InputChannels { get; private set; }
-        
-        /// <summary>
-        /// Gets or sets the size of memory allocated for reading encoded data.
-        /// 4000 is recommended.
-        /// </summary>
-        public int MaxDataBytes { get; set; }
-
 
         /// <summary>
         /// Gets or sets the bitrate setting of the encoding.
@@ -81,11 +71,11 @@ namespace OpusWrapper.Opus
 
         #endregion properties
 
-        private OpusEncoder(IntPtr encoder, byte inputChannels)
+        private OpusEncoder(IntPtr encoder, byte inputChannels, uint maxDataBytes)
         {
             _encoder = encoder;
-            InputChannels = inputChannels;
-            MaxDataBytes = 4000;
+            _maxDataBytes = maxDataBytes;
+            _inputChannels = inputChannels;
         }
 
         /// <summary>
@@ -103,7 +93,7 @@ namespace OpusWrapper.Opus
             {
                 throw new Exception("Exception occured while creating encoder");
             }
-            return new OpusEncoder(encoder, inputChannels);
+            return new OpusEncoder(encoder, inputChannels, 4000);
         }
 
         /// <summary>
@@ -111,9 +101,9 @@ namespace OpusWrapper.Opus
         /// </summary>
         /// <param name="inputPcmSamples">PCM samples to encode.</param>
         /// <param name="sampleLength">How many bytes to encode.</param>
-        /// <param name="encodedLength">Set to length of encoded audio.</param>
-        /// <returns>Opus encoded audio buffer.</returns>
-        public unsafe byte[] Encode(byte[] inputPcmSamples, int sampleLength)
+        /// <param name="encoded">Opus encoded audio buffer.</param>
+        /// <returns>Opus encoded audio buffer length.</returns>
+        public unsafe int Encode(byte[] inputPcmSamples, uint sampleLength, out byte[] encoded)
         {
             if (_disposed)
             {
@@ -121,7 +111,7 @@ namespace OpusWrapper.Opus
             }
 
             int frames = FrameCount(inputPcmSamples);
-            var encoded = new byte[MaxDataBytes];
+            encoded = new byte[_maxDataBytes];
             int length;
             fixed (byte* benc = encoded)
             {
@@ -130,20 +120,9 @@ namespace OpusWrapper.Opus
             }
             if (length < 0)
             {
-                throw new Exception("Encoding failed - " + ((ErrorCode)length).ToString());
+                throw new Exception(String.Format("Encoding failed - {0}", ((ErrorCode)length).ToString()));
             }
-
-            byte[] rezult;
-            if (encoded.Length != length)
-            {
-                rezult = new byte[length];
-                Array.Copy(encoded, rezult, length);
-            }
-            else
-            {
-                rezult = encoded;
-            }
-            return rezult;
+            return length;
         }
 
         /// <summary>
@@ -155,7 +134,7 @@ namespace OpusWrapper.Opus
         {
             //  seems like bitrate should be required
             int bitrate = 16;
-            int bytesPerSample = (bitrate / 8) * InputChannels;
+            int bytesPerSample = (bitrate / 8) * _inputChannels;
             return pcmSamples.Length / bytesPerSample;
         }
 
@@ -164,10 +143,10 @@ namespace OpusWrapper.Opus
         /// </summary>
         /// <param name="frameCount">Target frame size.</param>
         /// <returns></returns>
-        public int FrameByteCount(int frameCount)
+        public uint FrameByteCount(uint frameCount)
         {
-            int bitrate = 16;
-            int bytesPerSample = (bitrate / 8) * InputChannels;
+            uint bitrate = 16;
+            uint bytesPerSample = (bitrate / 8) * _inputChannels;
             return frameCount * bytesPerSample;
         }
 

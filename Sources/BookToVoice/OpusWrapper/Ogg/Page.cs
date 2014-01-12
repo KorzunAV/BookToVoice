@@ -8,29 +8,29 @@ namespace OpusWrapper.Ogg
         /// <summary>
         /// Pointer to the page header for this page. The exact contents of this header are defined in the framing spec document.
         /// </summary>
-        public OggsHeader header;
+        public OggsHeader Header;
 
         /// <summary>
         /// Length of the page header in bytes. 
         /// </summary>
-        public Int32 header_len;
+        public Int32 HeaderLen;
 
         /// <summary>
         /// Pointer to the data for this page.
         /// </summary>
-        public byte[] body;
+        public byte[] Body;
 
         /// <summary>
         /// Length of the body data in bytes.
         /// </summary>
-        public Int32 body_len;
+        public Int32 BodyLen;
 
 
         public int Write(Stream stream)
         {
-            stream.Write(header.Data, 0, header_len);
-            stream.Write(body, 0, body_len);
-            return header_len + body_len;
+            stream.Write(Header.Data, 0, HeaderLen);
+            stream.Write(Body, 0, BodyLen);
+            return HeaderLen + BodyLen;
         }
     }
 }

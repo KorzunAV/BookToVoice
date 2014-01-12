@@ -9,17 +9,16 @@ namespace OpusWrapper.Ogg
     public class Packet
     {
         public byte[] PacketData;
-        //public UInt32 Bytes;
+        public int PacketDataLength;
         public Int32 Bos;
         public Int32 Eos;
-
-        public UInt64 Granulepos;
+        public UInt64 GranulePos;
 
         /// <summary>
         /// sequence number for decode; the framing knows where there's a hole in the data,
         /// but we need coupling so that the codec (which is in a separate abstraction layer) 
         /// also knows about the gap
         /// </summary>
-        public UInt64 PacketNo;
+        //public UInt64 PacketNo;
     }
 }

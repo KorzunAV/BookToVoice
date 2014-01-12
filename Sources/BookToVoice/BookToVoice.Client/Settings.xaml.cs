@@ -7,13 +7,13 @@ namespace BookToVoice.Client
 	/// <summary>
 	/// Interaction logic for Window1.xaml
 	/// </summary>
-	public partial class Settings : Window
+	public partial class Settings
 	{
 		private IEnumerable<string> Voises
 		{
 			get
 			{
-				var manager = TextToVoiceManager.Create();
+				var manager = new TextToVoiceManager();
 				return manager.GetVoices();
 			}
 		}
@@ -26,13 +26,13 @@ namespace BookToVoice.Client
 
 		private void btnClose_Click(object sender, RoutedEventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void btnSave_Click(object sender, RoutedEventArgs e)
 		{
-			BookToVoice.Core.Properties.Settings.Default.Save();
-			this.Close();
+			Core.Properties.Settings.Default.Save();
+			Close();
 		}
 	}
 }

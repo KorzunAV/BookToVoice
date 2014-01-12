@@ -64,5 +64,7 @@ namespace OpusWrapper.Opus.Presets
             get { return _applicationType; }
             set { _applicationType = value; }
         }
+
+        public byte InputeBits = 16;
     }
 }

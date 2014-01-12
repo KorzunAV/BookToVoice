@@ -159,12 +159,23 @@ namespace OpusWrapper.Ogg
         public byte[] SegmentTable
         {
             get { return Data.Skip(27).ToArray(); }
-            set { Array.Copy(value, 0, Data, 27, value.Length); }
+            set { 
+                Array.Copy(value, 0, Data, 27, value.Length);
+                _segmentTableSum = Data.Skip(27).Sum(b => b);
+            }
         }
 
+        private int _segmentTableSum = int.MinValue;
         public int SegmentTableSum
         {
-            get { return Data.Skip(27).Sum(b => b); }
+            get
+            {
+                if (_segmentTableSum == int.MinValue)
+                {
+                    _segmentTableSum = Data.Skip(27).Sum(b => b);
+                }
+                return _segmentTableSum;
+            }
         }
 
         ///// <summary>9.[27] segment_table:

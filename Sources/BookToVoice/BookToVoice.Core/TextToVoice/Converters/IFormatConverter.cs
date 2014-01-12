@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 
 namespace BookToVoice.Core.TextToVoice.Converters
 {
-    interface IFormatConverter : IDisposable
+    public interface IFormatConverter : IDisposable
     {
         void ConvertAsyn(byte[] waveData);
     }

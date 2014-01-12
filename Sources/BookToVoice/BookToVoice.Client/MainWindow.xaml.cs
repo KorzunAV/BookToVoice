@@ -13,7 +13,7 @@ namespace BookToVoice.Client
 {
     public partial class MainWindow
     {
-        private readonly TextToVoiceManager _factory = TextToVoiceManager.Create();
+        private readonly TextToVoiceManager _factory = new TextToVoiceManager();
         private static readonly IEnumerable<string> Txt = new[] { "txt" };
 
         private static readonly Dictionary<string, string> CleanStrategy = new Dictionary<string, string>
@@ -99,15 +99,31 @@ namespace BookToVoice.Client
                         if (rez == MessageBoxResult.Yes)
                         {
                             File.Delete(filePath);
-                            File.Copy(fileFullName, filePath);
+                            FileFormat(fileFullName, filePath, enc);
                         }
                         _factory.Add(filePath);
                     }
                 }
                 else
                 {
-                    File.Copy(fileFullName, filePath);
+                    FileFormat(fileFullName, filePath, enc);
                     _factory.Add(filePath);
+                }
+            }
+        }
+
+        private void FileFormat(string fileFullName, string filePath, Encoding enc)
+        {
+            using (var sr = new StreamReader(fileFullName, enc))
+            {
+                using (var sw = new StreamWriter(filePath, false, Encoding.Default))
+                {
+                    var text = sr.ReadToEnd();
+                    foreach (var filter in _filters)
+                    {
+                        text = filter.Execute(text);
+                    }
+                    sw.Write(text);
                 }
             }
         }
@@ -117,15 +133,26 @@ namespace BookToVoice.Client
             _factory.StartAll();
         }
 
+
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             lbConvertedFiles.ItemsSource = _factory.GetData();
         }
 
+        private void MainWindow_OnClosed(object sender, EventArgs eventArgs)
+        {
+            _factory.Dispose();
+        }
+
+
         private void BtnStartPause_OnClick(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
+            if (button != null)
+            {
             var model = button.DataContext as TextToVoiceModel;
+                if (model != null)
+                {
             if (model.CurrentState == TextToVoiceModel.States.Run)
             {
                 _factory.Pause(model);
@@ -136,11 +163,17 @@ namespace BookToVoice.Client
                 _factory.Start(model);
             }
         }
+            }
+        }
 
         private void BtnDelete_OnClick(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
+            if (button != null)
+            {
             var model = button.DataContext as TextToVoiceModel;
+                if (model != null)
+                {
             var fi = new FileInfo(model.FilePath);
             if (fi.Exists)
             {
@@ -148,10 +181,7 @@ namespace BookToVoice.Client
             }
             _factory.Remove(model);
         }
-
-        private void MainWindow_OnClosed(object sender, EventArgs eventArgs)
-        {
-            _factory.Dispose();
+            }
         }
 
         private void BtnCleanClick(object sender, RoutedEventArgs e)
@@ -159,19 +189,27 @@ namespace BookToVoice.Client
             lbFiles.Items.Clear();
         }
 
+
         private void MenuItemOptions_OnClick(object sender, RoutedEventArgs e)
         {
             var settings = new Settings();
             settings.Show();
         }
 
+
         private void BtnEdite_OnClick(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
+            if (button != null)
+            {
             var model = button.DataContext as TextToVoiceModel;
-
+                if (model != null)
+                {
             System.Diagnostics.Process.Start(model.FilePath);
         }
+            }
+        }
+
 
         private void LbFilesDrop(object sender, DragEventArgs e)
         {

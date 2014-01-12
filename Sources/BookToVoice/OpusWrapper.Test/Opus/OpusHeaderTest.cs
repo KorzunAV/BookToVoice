@@ -26,7 +26,6 @@ namespace OpusWrapper.Test.Opus
             var teplate = ChanelTemplateCollection.GetTemplate(header.Channels - 1);
             Assert.IsTrue(header.StreamsCount == teplate.StreamsCount);
             Assert.IsTrue(header.CoupledStreamsCount == teplate.CoupledStreamsCount);
-            Assert.IsTrue(header.StreamMap.SequenceEqual(teplate.Mapping));
         }
     }
 }

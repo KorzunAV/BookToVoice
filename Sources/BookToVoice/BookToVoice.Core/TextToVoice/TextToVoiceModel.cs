@@ -14,6 +14,7 @@ namespace BookToVoice.Core.TextToVoice
         private string[] _textLines;
         private DateTime? _lastStart;
         private States _currentState;
+        private string _outFilePath;
 
 
         [XmlElement]
@@ -72,7 +73,18 @@ namespace BookToVoice.Core.TextToVoice
         }
 
         [XmlElement]
-        public string OutFilePath { get; set; }
+        public string OutFilePath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_outFilePath))
+                {
+                    _outFilePath = string.Format("{0:d_M_yyy_HH_mm_ss}", DateTime.Now);
+                }
+                return _outFilePath;
+            }
+            set { _outFilePath = value; }
+        }
 
         [XmlElement]
         public int CurrentLine
@@ -97,7 +109,7 @@ namespace BookToVoice.Core.TextToVoice
 
         public void SetText(string text)
         {
-            _textLines = text.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            _textLines = text.Split(new[] { "\r\n"}, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private string SecondsToTimeFormate(double seconds)

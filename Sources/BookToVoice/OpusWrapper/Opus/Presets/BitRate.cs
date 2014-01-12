@@ -38,6 +38,11 @@ namespace OpusWrapper.Opus.Presets
 
         public static BitRate Create(int bitRate)
         {
+            if (bitRate >= 6 && bitRate <= 510)
+            {
+                return new BitRate(bitRate * 1000);
+            }
+
             if (bitRate >= 6000 && bitRate <= 510000)
             {
                 return new BitRate(bitRate);

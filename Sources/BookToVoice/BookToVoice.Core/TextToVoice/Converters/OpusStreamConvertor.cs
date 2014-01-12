@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using OpusWrapper;
 using OpusWrapper.Ogg;
 using OpusWrapper.Opus;
 using OpusWrapper.Opus.Presets;
@@ -9,71 +10,43 @@ namespace BookToVoice.Core.TextToVoice.Converters
     public class OpusStreamConvertor : BaseStreamConvertor
     {
         private readonly StreamState _streamState;
-        private readonly OpusEncoder _encoder;
-        private readonly Stream _stream;
         private readonly Options _options;
-        readonly int _bytesPerSegment;
-        private byte[] _notEncodedBuffer = new byte[0];
+        private readonly string _fileName;
+
 
         public OpusStreamConvertor(string fileName, Options options)
         {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                fileName = string.Format("{0:d_M_yyy_HH_mm_ss}.opus", DateTime.Now);
-            }
-            else if (!fileName.EndsWith(".opus"))
-            {
-                fileName += ".opus";
-            }
-
+            _fileName = fileName + ".opus";
             _options = options;
+            _streamState = new StreamState(options);
 
-            var fi = new FileInfo(fileName);
-
-            var random = new Random(DateTime.Now.Minute + DateTime.Now.Second);
-            _streamState = new StreamState((uint)random.Next(0, int.MaxValue));
-
-            _encoder = OpusEncoder.Create(options.InputSamplingRate, options.InputChannels.Value, options.ApplicationType);
-            _encoder.Bitrate = _options.BitRate.Value;
-
-            _bytesPerSegment = _encoder.FrameByteCount(options.FrameSize.Value);
-
-            if (!fi.Exists)
+            if (File.Exists(_fileName))
             {
-                _stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read);
-                SetHeader(_streamState, _stream);
-                SetComment(_streamState, _stream);
+                SetGranulePos(_streamState);
             }
             else
             {
-                _stream = new FileStream(fileName, FileMode.Open, FileAccess.Write, FileShare.Read);
+                using (var fs = new FileStream(_fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    SetHeader(_streamState, fs);
+                    SetComment(_streamState, fs);
+                }
             }
         }
 
 
         protected override void ExecuteConvert(byte[] waveData)
         {
-            var soundBuffer = new byte[waveData.Length + _notEncodedBuffer.Length];
-            Array.Copy(_notEncodedBuffer, soundBuffer, _notEncodedBuffer.Length);
-            Array.Copy(waveData, 0, soundBuffer, _notEncodedBuffer.Length, waveData.Length);
-
-            int byteCap = _bytesPerSegment;
-            int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
-            int segmentsEnd = segmentCount * byteCap;
-            int notEncodedCount = soundBuffer.Length - segmentsEnd;
-            _notEncodedBuffer = new byte[notEncodedCount];
-            Array.Copy(soundBuffer, segmentsEnd, _notEncodedBuffer, 0, notEncodedCount);
-            _granulepos += (UInt64)waveData.Length;
-            for (uint i = 0; i < segmentCount; i++)
+            _streamState.AddWaveData(waveData);
+            var pageCount = _streamState.TotalPages();
+            if (pageCount > 10)
             {
-                var segment = new byte[byteCap];
-                Array.Copy(soundBuffer, i * byteCap, segment, 0, segment.Length);
-                byte[] buff = _encoder.Encode(segment, segment.Length);
-                SetData(_streamState, buff, i, _granulepos);
+                using (var fs = new FileStream(_fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                {
+                    _streamState.Flush(fs);
+                }
             }
         }
-
-        private UInt64 _granulepos;
 
         private void SetHeader(StreamState os, Stream stream)
         {
@@ -83,12 +56,12 @@ namespace BookToVoice.Core.TextToVoice.Converters
             var op = new Packet
             {
                 PacketData = header.Packet,
+                PacketDataLength = header.Packet.Length,
                 Bos = 1,
                 Eos = 0,
-                Granulepos = 0,
-                PacketNo = 0
+                GranulePos = 0
             };
-            os.Packetin(op);
+            os.AddWaveData(op);
             os.Flush(stream);
         }
 
@@ -105,40 +78,46 @@ namespace BookToVoice.Core.TextToVoice.Converters
             var opComment = new Packet
             {
                 PacketData = opusTags.GetPacked(),
+                PacketDataLength = opusTags.GetPackedLength(),
                 Bos = 0,
                 Eos = 0,
-                Granulepos = 0,
-                PacketNo = 1
+                GranulePos = 0
             };
-            os.Packetin(opComment);
+            os.AddWaveData(opComment);
             os.Flush(stream);
         }
 
-        private void SetData(StreamState os, byte[] packet, UInt64 idPacket, UInt64 granulepos)
+        private void SetGranulePos(StreamState streamState)
         {
-            //UInt64 original_samples = 0;
-            //UInt64 rate = 48000;
-            //UInt64 coding_rate = 48000;
-            //UInt64 enc_granulepos = 0;
+            const uint key = 0x5367674F;
+            UInt32 buf = 0;
+            var granulepos = new byte[8];
+            var bitstreamSerialNumber = new byte[4];
 
-            //UInt64 cur_frame_size = 48000;
-
-            //enc_granulepos += cur_frame_size * 48000 / coding_rate;
-
-            var opData = new Packet
+            using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                PacketData = packet,
-                Bos = 0,
-                Granulepos = granulepos,
-                PacketNo = 2 + idPacket
-            };
-            os.Packetin(opData);
-
-            var pageCount = os.TotalPages();
-            if (pageCount > 1)
-            {
-                os.Flush(_stream);
+                for (var i = fs.Length - 1; i > -1; i--)
+                {
+                    fs.Position = i;
+                    var sByte = fs.ReadByte();
+                    buf = (buf << 8) + (byte)sByte;
+                    if (buf == key)
+                    {
+                        fs.Position = i + 6;
+                        for (int j = 0; j < 8; j++)
+                        {
+                            granulepos[j] = (byte)fs.ReadByte();
+                        }
+                        for (int j = 0; j < 4; j++)
+                        {
+                            bitstreamSerialNumber[j] = (byte)fs.ReadByte();
+                        }
+                        break;
+                    }
+                }
             }
+            streamState.GranulePos = BitConverter.ToUInt64(granulepos, 0);
+            streamState.SerialNo = BitConverter.ToUInt32(bitstreamSerialNumber, 0);
         }
 
         #region IDisposable
@@ -151,14 +130,14 @@ namespace BookToVoice.Core.TextToVoice.Converters
                 base.Dispose(disposing);
                 // Dispose managed resources.
                 _streamState.Eos = true;
-                _streamState.Flush(_stream);
-                _stream.Flush();
-                _stream.Dispose();
+                using (var fs = new FileStream(_fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    _streamState.Flush(fs);
+                }
                 // Note disposing has been done.
                 _disposed = true;
             }
         }
         #endregion IDisposable
-
     }
 }

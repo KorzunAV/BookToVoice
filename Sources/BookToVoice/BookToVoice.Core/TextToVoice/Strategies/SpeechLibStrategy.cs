@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using BookToVoice.Core.TextToVoice.Converters;
-using NAudio.Wave;
 using NLog;
 using OpusWrapper.Opus.Presets;
 using SpeechLib;
@@ -12,53 +10,33 @@ namespace BookToVoice.Core.TextToVoice.Strategies
 {
     public class SpeechLibStrategy : ITextToVoiceStrategy
     {
-        private readonly Logger _log;
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private readonly Options _options;
+        private readonly ConvertorFactory.SupportedType _supportedType;
         private SpVoice Voice { get; set; }
-        public WaveFormat WaveFormat { get; set; }
-        private double t1 = 0;
-        private double t11 = 0;
-        private readonly Options _options = new Options();
 
-        private SpeechLibStrategy()
+
+        public SpeechLibStrategy(Options options, int speedRate, ConvertorFactory.SupportedType supportedType)
         {
-            _log = LogManager.GetCurrentClassLogger();
+            _options = options;
+            _supportedType = supportedType;
+
             Voice = new SpVoice
                 {
-                    Rate = Properties.Settings.Default.SpeedRate,
+                    Rate = speedRate,
                 };
-            _options.OutSamplingRate = SamplingRate.Create(Properties.Settings.Default.SampleRate);
-            _options.OutChannels = Channels.Create(Properties.Settings.Default.Channels);
 
-            WaveFormat = new WaveFormat(22050, Properties.Settings.Default.Bits, Properties.Settings.Default.Channels);
             SetVoice(Properties.Settings.Default.VoiceName);
-        }
-
-
-        public static SpeechLibStrategy Create()
-        {
-            return new SpeechLibStrategy();
         }
 
         public void Execute(TextToVoiceModel model, string voiceName)
         {
-            var time1 = DateTime.Now;
-            //var spFileStream = new SpMemoryStream();
-            //Voice.AudioOutputStream = spFileStream;
-
-            //using (var fs = new FileStream(model.OutFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
-            //using (var converter = new WaveToMp3Convertor(64, WaveFormat, fs))
-            using (var converter = new OpusStreamConvertor(model.OutFilePath, _options))
+            using (var converter = ConvertorFactory.GetConverter(model.OutFilePath, _options, _supportedType))
             {
                 while (model.CurrentLine < model.TextLines.Length && model.CurrentState == TextToVoiceModel.States.Run)
                 {
-                    var spFileStream = new SpMemoryStream();
-                    Voice.AudioOutputStream = spFileStream;
-                    //  spFileStream.SetData(null);
                     var textLine = model.TextLines[model.CurrentLine];
-                    var time11 = DateTime.Now;
-                    var wavData = GetBytes(textLine, spFileStream);
-                    var time21 = DateTime.Now;
-                    t11 += (time21 - time11).TotalMilliseconds;
+                    var wavData = GetBytes(textLine);
                     converter.ConvertAsyn(wavData);
                     model.CurrentLine++;
                 }
@@ -67,9 +45,6 @@ namespace BookToVoice.Core.TextToVoice.Strategies
                     model.CurrentState = TextToVoiceModel.States.Done;
                 }
             }
-
-            var time2 = DateTime.Now;
-            t1 += (time2 - time1).TotalMilliseconds;
         }
 
         public IEnumerable<string> GetVoiceNames()
@@ -93,22 +68,59 @@ namespace BookToVoice.Core.TextToVoice.Strategies
             }
         }
 
-        private byte[] GetBytes(string textLine, SpMemoryStream spFileStream)
-        {
-            bool isError = false;
 
+        private bool TryGetBytes(string textLine, out byte[] data)
+        {
             try
             {
-                Voice.Speak(textLine, SpeechVoiceSpeakFlags.SVSFDefault);
+                var spFileStream = new SpMemoryStream();
+                Voice.AudioOutputStream = spFileStream;
+                Voice.Speak(textLine);
                 Voice.WaitUntilDone(Timeout.Infinite);
+                data = spFileStream.GetData() as byte[];
+                return true;
             }
             catch (Exception ex)
             {
-                _log.Error(ex.ToString());
-                isError = true;
+                Log.Error(string.Format("{0}: \r\n {1}", ex, textLine));
+            }
+            data = null;
+            return false;
+        }
+
+        private byte[] GetBytes(string textLine)
+        {
+            if (string.IsNullOrEmpty(textLine))
+            {
+                return new byte[0];
             }
 
-            return spFileStream.GetData() as byte[];
+            byte[] ret;
+            if (TryGetBytes(textLine, out ret))
+            {
+                return ret;
+            }
+
+            var words = textLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length > 1)
+            {
+                var len = words.Length / 2;
+                var fPart = GetBytes(string.Join(" ", words, 0, len));
+                var lPart = GetBytes(string.Join(" ", words, len, words.Length - len));
+                ret = new byte[fPart.Length + lPart.Length];
+                Array.Copy(fPart, ret, fPart.Length);
+                Array.Copy(lPart, ret, lPart.Length);
+            }
+            else
+            {
+                var len = textLine.Length / 2;
+                var fPart = GetBytes(string.Join(" ", textLine, 0, len));
+                var lPart = GetBytes(string.Join(" ", textLine, len, textLine.Length - len));
+                ret = new byte[fPart.Length + lPart.Length];
+                Array.Copy(fPart, ret, fPart.Length);
+                Array.Copy(lPart, ret, lPart.Length);
+            }
+            return ret;
         }
 
         #region IDisposable
@@ -125,9 +137,6 @@ namespace BookToVoice.Core.TextToVoice.Strategies
             if (!_disposed)
             {
                 // Dispose managed resources.
-                _log.Info(string.Format("t1={0}", t1));
-                _log.Info(string.Format("t11={0}", t11));
-
                 // Note disposing has been done.
                 _disposed = true;
             }

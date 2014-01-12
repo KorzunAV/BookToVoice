@@ -3,10 +3,11 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using BookToVoice.Core.Extensions;
+using BookToVoice.Core.TextToVoice.Converters;
 using BookToVoice.Core.TextToVoice.Strategies;
 using System.Linq;
 using System;
-using NLog;
+using OpusWrapper.Opus.Presets;
 
 namespace BookToVoice.Core.TextToVoice
 {
@@ -14,26 +15,28 @@ namespace BookToVoice.Core.TextToVoice
     {
         private static Thread _thread;
         public enum SupportedExtension { Mp3, Opus }
-        private readonly Logger _log;
         private readonly ITextToVoiceStrategy _strategy;
         private readonly TextToVoiceModelConteiner _models;
         private readonly string _voiceName;
         private Timer _timer;
         private static readonly Object Synk = new object();
 
+
+
         private bool _disposed;
 
-        private TextToVoiceManager()
+        public TextToVoiceManager()
         {
-            _log = LogManager.GetCurrentClassLogger();
-            _strategy = SpeechLibStrategy.Create();
+            var options = new Options
+                {
+                    OutSamplingRate = SamplingRate.Create(Properties.Settings.Default.SampleRate),
+                    OutChannels = Channels.Create(Properties.Settings.Default.Channels),
+                    BitRate = BitRate.Create(Properties.Settings.Default.BitRate)
+                };
+            _strategy = new SpeechLibStrategy(options, Properties.Settings.Default.SpeedRate,
+                                              ConvertorFactory.SupportedType.Opus);
             _voiceName = GetVoiceName();
             _models = new TextToVoiceModelConteiner();
-        }
-
-        public static TextToVoiceManager Create()
-        {
-            return new TextToVoiceManager();
         }
 
         public void Add(string fileFullNames)
@@ -119,6 +122,7 @@ namespace BookToVoice.Core.TextToVoice
                 _timer = new Timer(Execute, null, new TimeSpan(0, 0, 1), new TimeSpan(0, 0, 1));
             }
         }
+
         public TextToVoiceModelConteiner GetData()
         {
             return _models;
@@ -198,7 +202,6 @@ namespace BookToVoice.Core.TextToVoice
             return _strategy.GetVoiceNames();
         }
 
-
         #region IDisposable
 
         public void Dispose()
@@ -214,19 +217,16 @@ namespace BookToVoice.Core.TextToVoice
                 if (disposing)
                 {
                     // Dispose managed resources.
-                    _log.Info("Dispose");
                     if (_timer != null)
                     {
                         _timer.Dispose();
                     }
                     if (_thread != null && _thread.IsAlive)
                     {
-                        _log.Info("Dispose _thread");
                         _thread.Abort();
                     }
                     if (_strategy != null)
                     {
-                        _log.Info("Dispose _strategy");
                         _strategy.Dispose();
                     }
                 }
@@ -235,6 +235,5 @@ namespace BookToVoice.Core.TextToVoice
             }
         }
         #endregion IDisposable
-
     }
 }

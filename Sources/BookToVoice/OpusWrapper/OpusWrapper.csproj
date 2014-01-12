@@ -55,7 +55,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ogg\StreamState.cs" />
+    <Compile Include="StreamState.cs" />
     <Compile Include="Opus\Enums\Bandwidth.cs" />
     <Compile Include="Opus\Enums\Complexity.cs" />
     <Compile Include="Opus\Enums\MappingFamily.cs" />
@@ -74,7 +74,6 @@
     <Compile Include="Opus\Api.cs" />
     <Compile Include="Opus\OpusDecoder.cs" />
     <Compile Include="Opus\OpusEncoder.cs" />
-    <Compile Include="Ogg\Presets\Presets.cs" />
     <Compile Include="Opus\OpusTags.cs" />
     <Compile Include="Opus\Presets\BaseOption.cs" />
     <Compile Include="Opus\Presets\BitRate.cs" />
@@ -120,9 +119,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ogg\Enums\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

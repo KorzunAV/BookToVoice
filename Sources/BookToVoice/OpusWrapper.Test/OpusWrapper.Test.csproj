@@ -42,7 +42,6 @@
     <Compile Include="Ogg\OggsHeaderTest.cs" />
     <Compile Include="Opus\OpusHeaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OpusEncoderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

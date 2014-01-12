@@ -172,7 +172,7 @@ namespace OpusWrapper.Opus
         /// <param name="maxDataBytes"></param>
         /// <returns></returns>
         [DllImport("libopus.dll", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int opus_encode(IntPtr st, byte[] pcm, int frameSize, IntPtr data, int maxDataBytes);
+        internal static extern int opus_encode(IntPtr st, byte[] pcm, int frameSize, IntPtr data, uint maxDataBytes);
         
         /// <summary>
         /// Encodes an Opus frame from floating point input.
